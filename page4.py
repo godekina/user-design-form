@@ -32,9 +32,9 @@ def main():
     )
 
     # Navigation Buttons
-    col1, col2 = st.columns([1, 1])
+    col1, col2= st.columns([1, 1])
 
-    with col2:
+    with col1:
         if st.button("Close Incident"):
             if escalation_level == "Select Level":
                 st.error("Please select an escalation level.")
@@ -45,3 +45,6 @@ def main():
             else:
                 st.success(f"Incident resolved successfully by {resolution_team}. Navigating to home.")
                 st.session_state.page = "home"
+    with col2:
+        if st.button("Home"):
+            st.session_state.page = "home"
