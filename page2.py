@@ -3,26 +3,14 @@ import streamlit as st
 def main():
     st.title("Incident Classification")
 
-    # Automatically determine the incident class
-    if "selected_issue" in st.session_state:
-        issue = st.session_state.selected_issue
+    # Incident Classification Select Box
+    incident_class = st.selectbox(
+        "Incident Classification:",
+        ["Select Classification", "Software application", "Networking", "Domain issues"],
+        index=0
+    )
 
-        # Mapping logic for incident class
-        issue_to_class_map = {
-            "Application software crashes": "Software application",
-            "Unable to connect to server": "Networking",
-            "Active directory issue": "Domain issues",
-        }
-
-        incident_class = issue_to_class_map.get(issue, "Unclassified")
-    else:
-        st.warning("Please select an issue on Page 1 first.")
-        return
-
-    # Display pre-filled, read-only incident class
-    st.text_input("Incident Class:", value=incident_class, disabled=True)
-
-    # Allow priority selection without auto-submission
+    # Incident Priority Select Box
     priority = st.selectbox(
         "Incident Priority:",
         ["Select Priority", "Low", "Medium", "High"],
@@ -38,7 +26,10 @@ def main():
 
     with col2:
         if st.button("Next"):
-            if priority == "Select Priority":
+            if incident_class == "Select Classification":
+                st.error("Please select a valid incident classification before proceeding.")
+            elif priority == "Select Priority":
                 st.error("Please select a valid priority before proceeding.")
             else:
+                st.session_state.selected_classification = incident_class
                 st.session_state.page = "page3"

@@ -1,51 +1,53 @@
 import streamlit as st
 
 def main():
-    st.title("Incident Log/Status")
+    st.title("Incident Log and Status")
 
-    # Ensure we have the selected issue class from Page 2
+    # Ensure we have the selected issue from previous steps
     if "selected_issue" in st.session_state:
         issue_class = st.session_state.selected_issue
-
-        # Mapping logic for team assignment and diagnosis action
-        issue_mappings = {
-            "Software application": ("Software Support Team", "Reinstall the software and check for updates", "resolved@i.techsolutionuser"),
-            "Networking": ("Network Support Team", "Check router configurations and reset network", "resolved@dcdatauser"),
-            "Domain issues": ("Domain Support Team", "Verify domain settings and rejoin the network", "resolved@amouser"),
-        }
-        
-        assigned_team, diagnosis_action, resolution_email = issue_mappings.get(issue_class, 
-            ("General Support Team", "Perform general diagnostics and system checks", "resolved@generaluser"))
     else:
         st.warning("Please complete the previous steps before proceeding.")
         return
 
-    # Display pre-filled, read-only fields for assigned team and diagnosis action
-    st.text_input("Assigned Team (Auto-filled):", value=assigned_team, disabled=True)
-    st.text_area("Diagnosis Action (Auto-filled):", value=diagnosis_action, disabled=True)
-
-    # Incident resolution status as a select box
-    resolution_status = st.selectbox(
-        "Incident Resolution Status:",
-        ["", "Resolved", "Escalate"],
+    # Team assignment selection
+    assigned_team = st.selectbox(
+        "Select Assigned Team:",
+        ["Select Team", "Software Team", "Network Team", "Domain  Team", "Support Team"],
         index=0
     )
 
-    col1, col2 = st.columns([1, 1])
+    # Diagnosis action input
+    diagnosis_action = st.text_area(
+        "Diagnosis Action:",
+        placeholder="E.g., Checked the server logs and identified connection timeout."
+    )
+
+    # Incident resolution status selection
+    resolution_status = st.selectbox(
+        "Incident Resolution Status:",
+        ["Select Status", "Resolved", "Escalate"],
+        index=0
+    )
 
     # Navigation Buttons with Resolution Handling
+    col1, col2 = st.columns([1, 1])
+
     with col1:
         if st.button("Back"):
             st.session_state.page = "page2"
 
     with col2:
         if st.button("Next"):
-            if not resolution_status:
-                st.error("Please select an incident resolution status before proceeding.")
+            if assigned_team == "Select Team":
+                st.error("Please select an assigned team before proceeding.")
+            elif not diagnosis_action.strip():
+                st.error("Please enter a diagnosis action before proceeding.")
+            elif resolution_status == "Select Status":
+                st.error("Please select a resolution status.")
+            elif resolution_status == "Resolved":
+                st.success("Incident resolved successfully. Returning to homepage.")
+                st.session_state.page = "home"
             else:
-                if resolution_status == "Resolved":
-                    st.success(f"Incident resolved successfully. Resolution sent to {resolution_email} prees next to go back")
-                    st.session_state.page = "home"
-                else:
-                    st.warning("Incident escalated. Moving to escalation details.")
-                    st.session_state.page = "page4"
+                st.warning("Incident escalated. Moving to escalation details.")
+                st.session_state.page = "page4"
